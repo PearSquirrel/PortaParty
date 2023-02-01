@@ -5,7 +5,7 @@
 
 import asyncio
 import websockets
-from flyt_python import API
+from flyt_python import api
 
 
 async def listen_to_data():
