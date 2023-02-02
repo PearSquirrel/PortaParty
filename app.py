@@ -123,7 +123,7 @@ def run_object_detection():
 
         # print(len(indices)) 
 
-        if len(indices) >= 1:
+        if len(indices) > 2:
             print('PARTY TIME')
             return True
             
