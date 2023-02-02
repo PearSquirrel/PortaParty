@@ -77,9 +77,10 @@ class ObjectDetection():
 
             if len(indices) > 2:
                 print('PARTY TIME')
+                return True
                 
             else:
-                print("no people")
+                return False
 
 
                 # if class_names[class_ids[i]] != 'person':
@@ -102,7 +103,7 @@ class ObjectDetection():
 
             find_obj = find_objects(outputs, img)
 
-            cv2.imshow('Camera', img)
+            # cv2.imshow('Camera', img)
             cv2.waitKey(1)
             
             return find_obj
