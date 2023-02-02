@@ -1,7 +1,13 @@
+
 import cv2
 import numpy as np
 
-#captures live webcam or video file
+#ENV
+# api key = NjEzZDA4MjI0YjIzYmM0NGJkNjU5ZDlhNzZkZDEzODk4MmYzNzE3OGFiZjc4OWZhMThhYzE5MjQ=
+# vehicleId= r4EeYcnz
+# token = 60ac081f527e8baab8ac3bae078d1922d34cfd2e
+
+
 capture = cv2.VideoCapture(0)
 wh_target = 320
 confidence_threshold = 0.8
@@ -59,17 +65,23 @@ def find_objects(outputs, img):
         x, y, w, h = box[0], box[1], box[2], box[3]
         cv2.rectangle(img, (x, y), (x + w, y + h), (100, 100, 255), 2)
         cv2.putText(img, f'{class_names[class_ids[i]]} {int(confidence_values[i] * 100)}%', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (100, 100, 255), 2)
-       
+        
 
-        if class_names[class_ids[i]] != 'person':
-            print('move foward a little bit')
-        else:
-            print('stopped')
+    # print(len(indices)) 
+
+    if len(indices) > 2:
+        print('PARTY TIME')
+
+
+        # if class_names[class_ids[i]] != 'person':
+        #     print('move foward a little bit')
+        # else:
+        #     print('stopped')
     
 
 
 while True:
-    success, img = capture.read()
+    success, img = capture.read() 
 
     blob = cv2.dnn.blobFromImage(img, 1 / 255, (wh_target, wh_target), [0, 0, 0], 1, crop=False)
     network.setInput(blob)
