@@ -1,15 +1,19 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from drone_api import DroneController
 from blynk_api import WinchController
 import time
 from detect import ObjectDetection
 from flask_cors import CORS
 from get_party import PartyController
+import json
+import base64
+from PIL import Image
+import io
 
 
 app = Flask(__name__)
 CORS(app)
-
+party = False
 
 @app.route('/', methods=['GET', 'POST']) 
 def home():
@@ -17,7 +21,15 @@ def home():
 
 @app.route('/party', methods=['GET', 'POST']) 
 def party():
+    if not party:
+        return json.dumps({'objects': []})
+    
     print("clicked party")
+    image_string = json.loads(request.data)['image_string']
+    image_data = base64.b64decode(image_string)
+    image = Image.open(io.BytesIO(image_data))
+    # print(type(image))
+    # image.show()
 
     #### FlytBase Cloud API ####
     token = '60ac081f527e8baab8ac3bae078d1922d34cfd2e' # personal access token
@@ -25,46 +37,27 @@ def party():
                               fb_server_url='https://dev.flytbase.com/rest/ros/flytos')
 
     detect = ObjectDetection()
-    PartyController().get_party()
-    time.sleep(1)
-    PartyController().start_party()
-    # PartyController().stop_party()
-    # winch = WinchController()
-    # winch.lower_winch()
-    # print("Lowering winch...")
-    # time.sleep(2)
-    # winch.stop_winch()
+    # PartyController().get_party()
     # time.sleep(1)
-    # print("Stopped winch")
-    # winch.raise_winch()
-    print("Raising winch...")
-
-
-    party = True
-    while party:
-        if detect.run_object_detection():
-            # if detect.run_object_detection():
-            print("more than two people in the frame")
-            # time.sleep(20)
-
-            # detect.run_object_detection()
-                #### Blynk API ####
-            # winch = WinchController()
-            # winch.lower_winch()
-            # print("Lowering winch...")
-            # time.sleep(2)
-            # winch.stop_winch()
-            # time.sleep(1)
-            # print("Stopped winch")
-            # winch.raise_winch()
-            # print("Raising winch...")
-            party = False
-        else:
-            print("Not enough people")
+    # PartyController().start_party()
+    # PartyController().stop_party()
     
-        # print("less than three people in the frame")
-    
-    return render_template("party.html")
+    detected_objects = detect.get_detected_objects(image)
+    print("Found " + str(len(detected_objects)) + " people")
+
+    if len(detected_objects) > 2:
+        #### Blynk API ####
+        winch = WinchController()
+        winch.lower_winch()
+        print("Lowering winch...")
+        time.sleep(2)
+        winch.stop_winch()
+        time.sleep(1)
+        print("Stopped winch")
+        winch.raise_winch()
+        print("Raising winch...")
+        
+    return json.dumps({'status': 'success', 'objects': detected_objects})
 
 
 if __name__ == "__main__":
