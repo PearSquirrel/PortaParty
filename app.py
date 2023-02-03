@@ -18,7 +18,7 @@ import json, os, signal
 
 app = Flask(__name__)
 CORS(app)
-party = False
+party_is_active = False
 
 @app.route('/', methods=['GET', 'POST']) 
 def home():
@@ -26,7 +26,7 @@ def home():
 
 @app.route('/party', methods=['GET', 'POST']) 
 def party():
-    if not party:
+    if not party_is_active:
         return json.dumps({'objects': []})
     
     print("clicked party")
@@ -42,29 +42,34 @@ def party():
                               fb_server_url='https://dev.flytbase.com/rest/ros/flytos')
 
     detect = ObjectDetection()
-    PartyController().get_party()
+    # PartyController().get_party()
     # time.sleep(1)
-    PartyController().start_party()
+    # PartyController().start_party()
     # PartyController().stop_party()
     
     detected_objects = detect.get_detected_objects(image)
     print("Found " + str(len(detected_objects)) + " people")
 
-    if len(detected_objects) >= 1:
-
+    if len(detected_objects) >= 0:
+        party_is_active = True
+        PartyController().get_party()
+        PartyController().start_party()
         #### Blynk API ####
         winch = WinchController()
         winch.lower_winch()
         print("Lowering winch...")
         time.sleep(10)
         winch.stop_winch()
-        # time.sleep(1)
+        time.sleep(180)
         print("Stopped winch")
-        # winch.raise_winch()
+        winch.raise_winch()
         print("Raising winch...")
+        PartyController().stop_party()
+        party_is_active = False
         os.kill(os.getpid(), signal.SIGINT)
-        return jsonify({ "success": True, "message": "Server is shutting down..." })        
-    return json.dumps({'status': 'success', 'objects': detected_objects})
+        # else:
+        #     print("not enough people")
+    return json.dumps({'status': 'success', 'objects': detected_objects, 'party_status': 'winch_down'})
 
 
 if __name__ == "__main__":
