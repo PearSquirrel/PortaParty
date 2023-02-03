@@ -80,6 +80,7 @@ class ObjectDetection():
                 return True
                 
             else:
+                print("")
                 return False
 
 
@@ -104,7 +105,8 @@ class ObjectDetection():
             find_obj = find_objects(outputs, img)
 
             # cv2.imshow('Camera', img)
-            cv2.waitKey(1)
+            # cv2.waitKey(10)
+            # cv2.destroyAllWindows()
             
             return find_obj
 

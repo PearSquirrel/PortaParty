@@ -4,6 +4,7 @@ from blynk_api import WinchController
 import time
 from detect import ObjectDetection
 from flask_cors import CORS
+from get_party import PartyController
 
 
 app = Flask(__name__)
@@ -24,6 +25,20 @@ def party():
                               fb_server_url='https://dev.flytbase.com/rest/ros/flytos')
 
     detect = ObjectDetection()
+    PartyController().get_party()
+    time.sleep(1)
+    PartyController().start_party()
+    # PartyController().stop_party()
+    # winch = WinchController()
+    # winch.lower_winch()
+    # print("Lowering winch...")
+    # time.sleep(2)
+    # winch.stop_winch()
+    # time.sleep(1)
+    # print("Stopped winch")
+    # winch.raise_winch()
+    print("Raising winch...")
+
 
     party = True
     while party:
@@ -34,15 +49,15 @@ def party():
 
             # detect.run_object_detection()
                 #### Blynk API ####
-            winch = WinchController()
-            winch.lower_winch()
-            print("Lowering winch...")
-            time.sleep(2)
-            winch.stop_winch()
-            time.sleep(1)
-            print("Stopped winch")
-            winch.raise_winch()
-            print("Raising winch...")
+            # winch = WinchController()
+            # winch.lower_winch()
+            # print("Lowering winch...")
+            # time.sleep(2)
+            # winch.stop_winch()
+            # time.sleep(1)
+            # print("Stopped winch")
+            # winch.raise_winch()
+            # print("Raising winch...")
             party = False
         else:
             print("Not enough people")
