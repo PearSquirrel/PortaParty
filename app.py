@@ -1,12 +1,13 @@
-
 from flask import Flask, render_template
 from drone_api import DroneController
 from blynk_api import WinchController
 import time
 from detect import ObjectDetection
+from flask_cors import CORS
 
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/', methods=['GET', 'POST']) 
